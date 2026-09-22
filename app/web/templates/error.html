@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }} · HIS{% endblock %}
+
+{% block contenido %}
+<section class="pagina-error">
+  <p class="antetitulo">Error {{ estado }}</p>
+  <h1>{{ titulo }}</h1>
+  <p class="entradilla">{{ mensaje }}</p>
+
+  {% if detalles %}
+  <ul class="lista-detalles">
+    {% for d in detalles %}<li><strong>{{ d.campo }}:</strong> {{ d.mensaje }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="acciones">
+    <a class="boton" href="/">Buscar un paciente</a>
+    <a class="boton boton-fantasma" href="/citas">Ir a citas</a>
+  </div>
+</section>
+{% endblock %}

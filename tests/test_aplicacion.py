@@ -79,3 +79,42 @@ def test_CA_29_api_rest_documentada(cliente):
     assert "post" in rutas["/api/v1/pacientes"]
     assert "get" in rutas["/api/v1/pacientes/buscar"]
     assert {"get", "patch"} <= set(rutas["/api/v1/pacientes/{patient_id}"])
+
+
+def test_la_web_marca_los_errores_de_formato_al_modificar(cliente):
+    """Un dato con formato imposible debe marcar el campo, no romper la página.
+
+    La interfaz de edición devolvía un error del servidor cuando el fallo lo
+    detectaba el contrato (nombre larguísimo, fecha inventada, sexo inexistente)
+    en lugar de una regla de negocio.
+    """
+    ficha = registrar(cliente)
+    ruta = f"/pacientes/{ficha['patient_id']}/editar"
+
+    for datos in (
+        paciente_ejemplo(nombre="A" * 70),
+        paciente_ejemplo(fecha_nacimiento="32/13/2020"),
+        paciente_ejemplo(sexo="MARCIANO"),
+        paciente_ejemplo(telefono="123"),
+    ):
+        respuesta = cliente.post(ruta, data=datos)
+        assert respuesta.status_code == 422, f"debería marcar el campo: {datos['nombre']}"
+        assert "campo-error" in respuesta.text
+
+    # Y el paciente no se ha modificado por el camino.
+    assert cliente.get(f"/api/v1/pacientes/{ficha['patient_id']}").json()["nombre"] == "María"
+
+
+def test_los_errores_de_la_web_son_paginas_y_los_de_la_api_json(cliente):
+    """RF-23: mismo error, dos formas según quién pregunte."""
+    inexistente = "11111111-1111-4111-8111-111111111111"
+
+    pagina = cliente.get(f"/pacientes/{inexistente}")
+    assert pagina.status_code == 404
+    assert "text/html" in pagina.headers["content-type"]
+    assert "No lo hemos encontrado" in pagina.text
+    assert "Buscar un paciente" in pagina.text  # la página ofrece salida
+
+    api = cliente.get(f"/api/v1/pacientes/{inexistente}")
+    assert api.status_code == 404
+    assert api.json()["codigo"] == "PACIENTE_NO_ENCONTRADO"

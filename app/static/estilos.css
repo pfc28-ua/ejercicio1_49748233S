@@ -328,3 +328,75 @@ code.hc {
   .buscador { border-radius: var(--radio); flex-wrap: wrap; padding: 10px 14px; }
   .buscador button { width: 100%; }
 }
+
+
+/* =========================================================================
+   Módulo de citas (ejercicio 2)
+   ========================================================================= */
+
+.nota-acceso { margin: 18px 0 0 20px; font-size: 13px; color: var(--tinta-suave); }
+
+.bloque-citas { margin-top: 28px; }
+
+/* Tarjeta de cita del paciente */
+.cita {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 14px 18px; margin-bottom: 10px; border-radius: var(--radio);
+  background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea);
+}
+.cita-cancelada { opacity: .6; }
+.cita-cuando {
+  display: grid; place-items: center; flex: none;
+  min-width: 78px; padding: 10px 12px; border-radius: 12px;
+  background: var(--quirofano-claro); color: var(--quirofano-oscuro);
+}
+.cita-dia { font: 600 13px var(--texto); letter-spacing: .4px; }
+.cita-hora { font: 700 22px/1.1 var(--mono); }
+.cita-datos { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.cita-datos strong { font-size: 16px; }
+.cita-datos small { color: var(--tinta-suave); }
+.cita-acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.cancelada { color: var(--coral); font-weight: 600; }
+
+/* Filtros de búsqueda de cita */
+.filtros {
+  display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;
+  padding: 18px 20px; border-radius: var(--radio);
+  background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea);
+}
+.filtros .campo { margin-bottom: 0; }
+
+/* Lista de especialistas */
+.especialistas { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.especialista {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: var(--radio);
+  background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea);
+  text-decoration: none; transition: box-shadow .15s, transform .15s;
+}
+.especialista:hover { box-shadow: inset 0 0 0 1.5px var(--quirofano), var(--sombra); transform: translateY(-1px); }
+.especialista-activo { box-shadow: inset 0 0 0 2px var(--quirofano); background: var(--quirofano-claro); }
+.especialista strong { display: block; }
+.especialista small { color: var(--tinta-suave); }
+
+/* Huecos disponibles */
+.dia-huecos { margin-top: 18px; }
+.dia-huecos h3 { margin: 0 0 8px; font: 600 14px var(--texto); color: var(--tinta-suave); }
+.huecos { display: flex; gap: 8px; flex-wrap: wrap; }
+.hueco {
+  padding: 9px 14px; border: 1.5px solid var(--linea); border-radius: 10px;
+  background: #fff; color: var(--tinta); font: 600 15px var(--mono); cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.hueco:hover { border-color: var(--quirofano); background: var(--quirofano); color: #fff; }
+
+/* Los botones dentro de una fila de campos no deben estirarse a lo alto. */
+.fila > button, .fila > .boton { align-self: flex-end; margin-bottom: 14px; }
+.tarjeta .tabla th { padding-left: 0; }
+.tarjeta .tabla td { padding-left: 0; }
+
+/* Página de error de la interfaz web (RF-23). */
+.pagina-error { max-width: 60ch; padding: 40px 0; }
+.pagina-error .acciones { margin-top: 26px; }
+.lista-detalles { margin: 18px 0 0; padding-left: 20px; color: var(--tinta-suave); }
+.lista-detalles li { margin-bottom: 4px; }

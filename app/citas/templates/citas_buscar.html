@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block titulo %}Pedir cita · HIS{% endblock %}
+
+{% block contenido %}
+<header class="cabecera-pagina">
+  <a class="volver" href="/citas/mias?b={{ b }}">← Mis citas</a>
+  <h1>{% if reprogramar %}Elegir nuevo hueco{% else %}Pedir cita{% endif %}</h1>
+  <p class="entradilla">
+    {% if reprogramar %}Elige el hueco al que quieres mover tu cita. Conservará su código.
+    {% else %}Elige especialidad y centro, y después el hueco que mejor te venga.{% endif %}
+  </p>
+</header>
+
+<form class="filtros" method="get" action="/citas/buscar">
+  <input type="hidden" name="b" value="{{ b }}">
+  {% if reprogramar %}<input type="hidden" name="reprogramar" value="{{ reprogramar }}">{% endif %}
+  <label class="campo">
+    <span class="campo-etiqueta">Especialidad</span>
+    <select name="especialidad_id">
+      <option value="">Todas</option>
+      {% for e in especialidades %}
+      <option value="{{ e.id }}" {% if especialidad_id == e.id %}selected{% endif %}>{{ e.nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label class="campo">
+    <span class="campo-etiqueta">Centro</span>
+    <select name="centro_id">
+      <option value="">Todos</option>
+      {% for c in centros %}
+      <option value="{{ c.id }}" {% if centro_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label class="campo">
+    <span class="campo-etiqueta">A partir del</span>
+    <input type="date" name="desde" value="{{ desde }}">
+  </label>
+  <label class="campo">
+    <span class="campo-etiqueta">Cuándo te viene bien</span>
+    <select name="franja">
+      {% for valor, texto in franjas.items() %}
+      <option value="{{ valor }}" {% if franja == valor %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button type="submit" class="boton">Buscar</button>
+</form>
+
+<section class="bloque-citas">
+  <h2 class="titulo-seccion">Especialistas</h2>
+  <div class="especialistas">
+    {% for e in especialistas %}
+    <a class="especialista {% if elegido and elegido.id == e.id %}especialista-activo{% endif %}"
+       href="/citas/buscar?b={{ b }}&especialista_id={{ e.id }}&desde={{ desde }}&franja={{ franja }}{% if reprogramar %}&reprogramar={{ reprogramar }}{% endif %}">
+      <span class="avatar" style="--tono: {{ (e.nombre ~ e.apellidos)|tono }}">{{ e.nombre[0] }}{{ e.apellidos[0] }}</span>
+      <span>
+        <strong>{{ e.nombre_completo }}</strong>
+        <small>{{ e.especialidad.nombre }} · {{ e.centro.nombre }} · {{ e.duracion_cita_min }} min</small>
+      </span>
+    </a>
+    {% else %}
+    <p class="suave">No hay especialistas con esos filtros.</p>
+    {% endfor %}
+  </div>
+</section>
+
+{% if elegido %}
+<section class="bloque-citas">
+  <h2 class="titulo-seccion">Huecos de {{ elegido.nombre_completo }}</h2>
+  {% if mensaje %}<p class="suave">{{ mensaje }}</p>{% endif %}
+  {% for dia, huecos in por_dia.items() %}
+  <div class="dia-huecos">
+    <h3>{{ dia.weekday()|dia|capitalize }} {{ dia|fecha }}</h3>
+    <div class="huecos">
+      {% for h in huecos %}
+      <form method="post" action="{% if reprogramar %}/citas/{{ reprogramar }}/reprogramar{% else %}/citas/reservar{% endif %}">
+        <input type="hidden" name="b" value="{{ b }}">
+        <input type="hidden" name="especialista_id" value="{{ elegido.id }}">
+        <input type="hidden" name="inicio" value="{{ h.inicio.isoformat() }}">
+        <button type="submit" class="hueco">{{ h.inicio|hora }}</button>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+{% endblock %}

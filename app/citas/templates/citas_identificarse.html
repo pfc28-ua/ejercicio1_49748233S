@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Mis citas · HIS{% endblock %}
+
+{% block contenido %}
+<section class="portada">
+  <p class="antetitulo">Citas médicas</p>
+  <h1>Pide o consulta tu cita</h1>
+  <p class="entradilla">Identifícate con tu documento de identidad o con tu código de historia clínica para ver tus citas y reservar una nueva.</p>
+
+  <form class="buscador" method="get" action="/citas">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="text" name="b" id="buscador" value="{{ b }}" autocomplete="off" autofocus
+           placeholder="DNI, NIE, pasaporte o HC-2026-000001">
+    <button type="submit">Entrar</button>
+  </form>
+  <div class="buscador-pista" id="pista" aria-live="polite">
+    <span>Prueba con <button type="button" data-rellenar="12345678Z">12345678Z</button></span>
+  </div>
+  <p class="nota-acceso">Esta zona no pide contraseña: la identificación sirve solo para saber de quién son las citas.</p>
+</section>
+
+{% if mensaje %}
+<section class="resultado">
+  <div class="vacio">
+    <div class="vacio-icono" aria-hidden="true">?</div>
+    <div>
+      <h2>No hemos podido identificarte</h2>
+      <p>{{ mensaje }}</p>
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -254,6 +254,22 @@ class PacienteModificar(_Normalizacion):
     entidad_aseguradora: str | None = Field(default=None, max_length=120)
     numero_poliza: str | None = Field(default=None, max_length=60)
 
+    @model_validator(mode="wrap")
+    @classmethod
+    def _errores_como_los_del_dominio(cls, datos: Any, validar):
+        """Traduce los errores de formato al error de negocio del módulo (RF-08).
+
+        Sin esto, un dato con formato imposible —un nombre larguísimo, una fecha
+        inventada, un sexo que no existe— escapa como error de Pydantic en lugar
+        de como error de validación. La API lo recoge igualmente, pero la
+        interfaz web no, y la pantalla de edición se rompía con un error del
+        servidor en vez de marcar el campo (RF-23).
+        """
+        try:
+            return validar(datos)
+        except ValidationError as exc:
+            raise ErrorDeValidacion(detalles=_errores_de_pydantic(exc)) from exc
+
     def cambios(self) -> dict[str, Any]:
         """Solo los campos enviados (RF-17, DT-03)."""
         return self.model_dump(exclude_unset=True)

@@ -79,3 +79,111 @@ def registrar(cliente, **cambios) -> dict:
     respuesta = cliente.post("/api/v1/pacientes", json=paciente_ejemplo(**cambios))
     assert respuesta.status_code == 201, respuesta.text
     return respuesta.json()
+
+
+# --------------------------------------------------------------------------
+# Módulo de citas (ejercicio 2)
+# --------------------------------------------------------------------------
+
+def _proximo_dia_laborable(dias_minimos: int = 7):
+    """Primer día laborable a partir de hoy + `dias_minimos`.
+
+    Las pruebas trabajan siempre sobre fechas futuras, para no chocar con la
+    antelación mínima de reserva (RN-06).
+    """
+    from datetime import timedelta
+
+    dia = date.today() + timedelta(days=dias_minimos)
+    while dia.weekday() > 4:
+        dia += timedelta(days=1)
+    return dia
+
+
+@pytest.fixture()
+def catalogo(sesion):
+    """Catálogo de ejemplo: dos centros, dos especialidades y dos especialistas.
+
+    - `dermatologa`: lunes a viernes de 09:00 a 11:00, huecos de 20 minutos.
+    - `traumatologo`: los mismos días de 16:00 a 18:00, huecos de 30 minutos.
+    """
+    from datetime import time
+
+    from app.citas.models import Centro, Especialidad, Especialista, HorarioConsulta
+
+    norte = Centro(nombre="Clínica Norte", ciudad="Alicante")
+    sur = Centro(nombre="Centro Médico Sur", ciudad="Elche")
+    dermatologia = Especialidad(nombre="Dermatología")
+    traumatologia = Especialidad(nombre="Traumatología")
+    sesion.add_all([norte, sur, dermatologia, traumatologia])
+    sesion.flush()
+
+    dermatologa = Especialista(
+        nombre="Elena", apellidos="Ruiz Navarro",
+        especialidad_id=dermatologia.id, centro_id=norte.id, duracion_cita_min=20,
+    )
+    traumatologo = Especialista(
+        nombre="Carlos", apellidos="Alonso Prieto",
+        especialidad_id=traumatologia.id, centro_id=sur.id, duracion_cita_min=30,
+    )
+    sesion.add_all([dermatologa, traumatologo])
+    sesion.flush()
+
+    for dia in range(5):
+        sesion.add(HorarioConsulta(
+            especialista_id=dermatologa.id, dia_semana=dia,
+            hora_inicio=time(9, 0), hora_fin=time(11, 0),
+        ))
+        sesion.add(HorarioConsulta(
+            especialista_id=traumatologo.id, dia_semana=dia,
+            hora_inicio=time(16, 0), hora_fin=time(18, 0),
+        ))
+    sesion.commit()
+
+    return {
+        "centro_norte": norte.id,
+        "centro_sur": sur.id,
+        "dermatologia": dermatologia.id,
+        "traumatologia": traumatologia.id,
+        "dermatologa": dermatologa.id,
+        "traumatologo": traumatologo.id,
+    }
+
+
+@pytest.fixture()
+def servicio_citas(sesion):
+    from app.citas.services import ServicioCitas
+
+    return ServicioCitas(sesion)
+
+
+@pytest.fixture()
+def dia_consulta():
+    """Día laborable futuro sobre el que trabajan las pruebas."""
+    return _proximo_dia_laborable()
+
+
+def hueco(dia, hora: int, minuto: int = 0):
+    """Instante concreto dentro de la agenda, en formato ISO."""
+    from datetime import datetime, time
+
+    return datetime.combine(dia, time(hora, minuto))
+
+
+def reservar_cita(cliente, catalogo, paciente, dia, hora=9, minuto=0, especialista=None):
+    """Reserva una cita por la API y devuelve su ficha."""
+    respuesta = cliente.post("/api/v1/citas", json={
+        "tipo_documento": paciente["tipo_documento"],
+        "numero_documento": paciente["numero_documento"],
+        "especialista_id": especialista or catalogo["dermatologa"],
+        "inicio": hueco(dia, hora, minuto).isoformat(),
+    })
+    assert respuesta.status_code == 201, respuesta.text
+    return respuesta.json()
+
+
+def identificacion(paciente: dict) -> dict:
+    """Cuerpo de identificación del paciente para las operaciones sobre sus citas."""
+    return {
+        "tipo_documento": paciente["tipo_documento"],
+        "numero_documento": paciente["numero_documento"],
+    }

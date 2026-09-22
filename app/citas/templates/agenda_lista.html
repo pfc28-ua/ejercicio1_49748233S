@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}Agenda · HIS{% endblock %}
+
+{% block contenido %}
+<header class="cabecera-pagina">
+  <p class="antetitulo">Gestión de agenda</p>
+  <h1>¿Qué agenda vas a gestionar?</h1>
+  <p class="entradilla">Bloquea franjas por vacaciones, formación o baja, y ajusta la duración de los huecos de cada especialista.</p>
+</header>
+
+<div class="especialistas">
+  {% for e in especialistas %}
+  <a class="especialista" href="/agenda/{{ e.id }}">
+    <span class="avatar" style="--tono: {{ (e.nombre ~ e.apellidos)|tono }}">{{ e.nombre[0] }}{{ e.apellidos[0] }}</span>
+    <span>
+      <strong>{{ e.nombre_completo }}</strong>
+      <small>{{ e.especialidad.nombre }} · {{ e.centro.nombre }} · huecos de {{ e.duracion_cita_min }} min</small>
+    </span>
+  </a>
+  {% else %}
+  <p class="suave">No hay especialistas cargados. Ejecute <code>python datos_ejemplo_citas.py</code>.</p>
+  {% endfor %}
+</div>
+{% endblock %}

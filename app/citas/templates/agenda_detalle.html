@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block titulo %}Agenda de {{ especialista.nombre_completo }} · HIS{% endblock %}
+
+{% block contenido %}
+<header class="cabecera-pagina">
+  <a class="volver" href="/agenda">← Otras agendas</a>
+  <div class="ficha-cabecera">
+    <div class="titulo-con-avatar">
+      <span class="avatar avatar-grande" style="--tono: {{ (especialista.nombre ~ especialista.apellidos)|tono }}">{{ especialista.nombre[0] }}{{ especialista.apellidos[0] }}</span>
+      <div>
+        <h1>{{ especialista.nombre_completo }}</h1>
+        <p class="entradilla">{{ especialista.especialidad.nombre }} · {{ especialista.centro.nombre }}</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+{% if aviso %}
+<div class="alerta alerta-ok"><div class="alerta-icono" aria-hidden="true">✓</div><div><strong>{{ aviso }}</strong></div></div>
+{% endif %}
+{% if error %}
+<div class="alerta alerta-error"><div class="alerta-icono" aria-hidden="true">!</div><div><strong>{{ error }}</strong></div></div>
+{% endif %}
+
+<div class="ficha-rejilla">
+  <section class="tarjeta">
+    <h2>Horario de consulta</h2>
+    <dl class="datos">
+      {% for h in horarios %}
+      <div><dt>{{ h.dia_semana|dia|capitalize }}</dt><dd>{{ h.hora_inicio|hora }} – {{ h.hora_fin|hora }}</dd></div>
+      {% else %}
+      <div class="completo"><dd class="suave">Sin horario configurado.</dd></div>
+      {% endfor %}
+    </dl>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Duración de los huecos</h2>
+    <p class="suave">Afecta a la disponibilidad futura. Las citas ya reservadas no cambian.</p>
+    <form class="fila" method="post" action="/agenda/{{ especialista.id }}/duracion">
+      <label class="campo estrecho">
+        <span class="campo-etiqueta">Minutos</span>
+        <input type="number" name="duracion_cita_min" value="{{ especialista.duracion_cita_min }}" min="5" max="120" step="5">
+      </label>
+      <button type="submit" class="boton">Guardar</button>
+    </form>
+  </section>
+
+  <section class="tarjeta tarjeta-ancha">
+    <h2>Bloquear una franja</h2>
+    <p class="suave">No se puede bloquear una franja que ya tenga citas reservadas: primero hay que reprogramarlas o cancelarlas.</p>
+    <form class="fila" method="post" action="/agenda/{{ especialista.id }}/bloqueos">
+      <label class="campo"><span class="campo-etiqueta">Desde</span><input type="datetime-local" name="inicio" required></label>
+      <label class="campo"><span class="campo-etiqueta">Hasta</span><input type="datetime-local" name="fin" required></label>
+      <label class="campo estrecho">
+        <span class="campo-etiqueta">Motivo</span>
+        <select name="motivo">
+          {% for valor, texto in motivos.items() %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="campo"><span class="campo-etiqueta">Observaciones</span><input type="text" name="observaciones"></label>
+      <button type="submit" class="boton">Bloquear</button>
+    </form>
+  </section>
+
+  <section class="tarjeta tarjeta-ancha">
+    <h2>Bloqueos <small>{{ desde|fecha }} – {{ hasta|fecha }}</small></h2>
+    {% if bloqueos %}
+    <table class="tabla">
+      <thead><tr><th>Desde</th><th>Hasta</th><th>Motivo</th><th>Observaciones</th><th></th></tr></thead>
+      <tbody>
+        {% for bl in bloqueos %}
+        <tr>
+          <td>{{ bl.inicio|fechahora }}</td>
+          <td>{{ bl.fin|fechahora }}</td>
+          <td><span class="chip">{{ bl.motivo|motivo }}</span></td>
+          <td>{{ bl.observaciones or '—' }}</td>
+          <td>
+            <form method="post" action="/agenda/{{ especialista.id }}/bloqueos/{{ bl.id }}/levantar">
+              <button type="submit" class="boton boton-fantasma">Levantar</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="suave">Sin bloqueos en este periodo.</p>
+    {% endif %}
+  </section>
+
+  <section class="tarjeta tarjeta-ancha">
+    <h2>Citas reservadas <small>{{ desde|fecha }} – {{ hasta|fecha }}</small></h2>
+    {% if citas %}
+    <table class="tabla">
+      <thead><tr><th>Cuándo</th><th>Paciente</th><th>Historia clínica</th><th>Cita</th></tr></thead>
+      <tbody>
+        {% for c in citas %}
+        <tr>
+          <td>{{ c.inicio|fechahora }} <span class="suave">({{ c.duracion_min }} min)</span></td>
+          <td>{{ pacientes[c.codigo].nombre_completo }}</td>
+          <td><code class="hc">{{ pacientes[c.codigo].codigo_historia_clinica }}</code></td>
+          <td><code>{{ c.codigo }}</code></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="suave">Sin citas reservadas en este periodo.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

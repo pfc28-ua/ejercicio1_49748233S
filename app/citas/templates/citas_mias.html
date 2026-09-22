@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block titulo %}Mis citas · HIS{% endblock %}
+
+{% macro tarjeta(c, editable) %}
+<article class="cita {{ 'cita-cancelada' if c.estado == 'CANCELADA' }}">
+  <div class="cita-cuando">
+    <span class="cita-dia">{{ c.inicio.strftime('%d/%m') }}</span>
+    <span class="cita-hora">{{ c.inicio|hora }}</span>
+  </div>
+  <div class="cita-datos">
+    <strong>{{ c.especialista.especialidad.nombre }}</strong>
+    <span>{{ c.especialista.nombre_completo }} · {{ c.especialista.centro.nombre }}</span>
+    <small><code class="hc">{{ c.codigo }}</code> · {{ c.duracion_min }} min
+      {% if c.estado == 'CANCELADA' %}· <span class="cancelada">Cancelada</span>{% endif %}
+      {% if c.motivo_consulta %}· {{ c.motivo_consulta }}{% endif %}
+    </small>
+  </div>
+  {% if editable and c.estado == 'RESERVADA' %}
+  <div class="cita-acciones">
+    <a class="boton boton-fantasma" href="/citas/buscar?b={{ b }}&especialista_id={{ c.especialista.id }}&reprogramar={{ c.cita_id }}">Reprogramar</a>
+    <form method="post" action="/citas/{{ c.cita_id }}/cancelar" data-confirmar="¿Cancelar la cita {{ c.codigo }}?">
+      <input type="hidden" name="b" value="{{ b }}">
+      <button type="submit" class="boton boton-peligro">Cancelar</button>
+    </form>
+  </div>
+  {% endif %}
+</article>
+{% endmacro %}
+
+{% block contenido %}
+<header class="cabecera-pagina">
+  <a class="volver" href="/citas">← Salir</a>
+  <div class="ficha-cabecera">
+    <div>
+      <h1>Mis citas</h1>
+      <p class="entradilla">{{ paciente.nombre_completo }} · <code class="hc">{{ paciente.codigo_historia_clinica }}</code></p>
+    </div>
+    <a class="boton" href="/citas/buscar?b={{ b }}">Pedir cita nueva</a>
+  </div>
+</header>
+
+{% if nueva %}
+<div class="alerta alerta-ok">
+  <div class="alerta-icono" aria-hidden="true">✓</div>
+  <div><strong>Cita confirmada.</strong><p>Su código de cita es <code class="hc">{{ nueva }}</code></p></div>
+</div>
+{% elif aviso %}
+<div class="alerta alerta-ok"><div class="alerta-icono" aria-hidden="true">i</div><div><strong>{{ aviso }}</strong></div></div>
+{% endif %}
+
+<section class="bloque-citas">
+  <h2 class="titulo-seccion">Próximas</h2>
+  {% if futuras %}
+    {% for c in futuras %}{{ tarjeta(c, True) }}{% endfor %}
+  {% else %}
+    <div class="vacio">
+      <div class="vacio-icono" aria-hidden="true">+</div>
+      <div><h2>No tienes citas próximas</h2><p>Puedes pedir una ahora mismo.</p></div>
+      <a class="boton" href="/citas/buscar?b={{ b }}">Pedir cita</a>
+    </div>
+  {% endif %}
+</section>
+
+{% if pasadas %}
+<section class="bloque-citas">
+  <h2 class="titulo-seccion">Anteriores</h2>
+  {% for c in pasadas %}{{ tarjeta(c, False) }}{% endfor %}
+</section>
+{% endif %}
+{% endblock %}
