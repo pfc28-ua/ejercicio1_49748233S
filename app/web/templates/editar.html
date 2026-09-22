@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar %}
+{% block titulo %}Editar {{ paciente.nombre_completo }} · Admisión HIS{% endblock %}
+
+{% block contenido %}
+<header class="cabecera-pagina">
+  <a class="volver" href="/pacientes/{{ paciente.patient_id }}">← Volver a la ficha</a>
+  <div class="titulo-con-avatar">
+    {{ avatar(paciente, 'avatar-grande') }}
+    <div>
+      <h1>Editar datos</h1>
+      <p class="entradilla">{{ paciente.nombre_completo }} · su identidad <code class="hc">{{ paciente.codigo_historia_clinica }}</code> no cambia.</p>
+    </div>
+  </div>
+</header>
+
+{% if mensaje %}
+<div class="alerta alerta-error">
+  <div class="alerta-icono" aria-hidden="true">!</div>
+  <div><strong>{{ mensaje }}</strong><p>No se ha guardado ningún cambio.</p></div>
+</div>
+{% endif %}
+
+<form method="post" action="/pacientes/{{ paciente.patient_id }}/editar" class="formulario" novalidate>
+  {% with nota_contacto = 'deja un campo vacío para borrarlo' %}{% include "_formulario.html" %}{% endwith %}
+  <div class="barra-acciones">
+    <span class="suave">Solo se modifican los datos del paciente, nunca su identidad</span>
+    <a class="boton boton-fantasma" href="/pacientes/{{ paciente.patient_id }}">Cancelar</a>
+    <button type="submit" class="boton">Guardar cambios</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Admisión · HIS{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/estilos.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="lateral">
+      <a class="marca" href="/">
+        <span class="marca-cruz" aria-hidden="true"></span>
+        <span class="marca-texto">
+          <strong>Admisión</strong>
+          <small>HIS · Pacientes</small>
+        </span>
+      </a>
+
+      <nav class="menu">
+        <a href="/" class="{{ 'activo' if seccion == 'buscar' }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          Buscar paciente
+        </a>
+        <a href="/pacientes/nuevo" class="{{ 'activo' if seccion == 'nuevo' }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M3 21c0-4 3-6 7-6s7 2 7 6M19 8v6M16 11h6"/></svg>
+          Registrar paciente
+        </a>
+      </nav>
+
+      <div class="lateral-pie">
+        <span class="punto-vivo"></span>
+        Personal administrativo
+      </div>
+    </aside>
+
+    <main class="principal">
+      {% block contenido %}{% endblock %}
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

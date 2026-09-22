@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Buscar paciente · Admisión HIS{% endblock %}
+
+{% block contenido %}
+<section class="portada">
+  <p class="antetitulo">Búsqueda y verificación de identidad</p>
+  <h1>¿Quién viene hoy?</h1>
+  <p class="entradilla">Busca antes de registrar. Escribe el documento de identidad o el código de historia clínica del paciente.</p>
+
+  <form class="buscador" method="get" action="/" role="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="text" name="b" id="buscador" value="{{ b }}" autocomplete="off" autofocus
+           placeholder="DNI, NIE, pasaporte o HC-2026-000001">
+    <button type="submit">Buscar</button>
+  </form>
+  <div class="buscador-pista" id="pista" aria-live="polite">
+    <span>Prueba con <button type="button" data-rellenar="12345678Z">12345678Z</button>
+      <button type="button" data-rellenar="HC-2026-000003">HC-2026-000003</button></span>
+  </div>
+</section>
+
+{% if mensaje %}
+<section class="resultado">
+  <div class="vacio">
+    <div class="vacio-icono" aria-hidden="true">?</div>
+    <div>
+      <h2>{{ 'Sin coincidencias' if ofrecer_alta else 'Búsqueda no válida' }}</h2>
+      <p>{{ mensaje }}</p>
+      {% if ofrecer_alta %}<p class="suave">Si es la primera vez que viene al centro, regístralo.</p>{% endif %}
+    </div>
+    {% if ofrecer_alta %}
+    <a class="boton" href="/pacientes/nuevo?numero_documento={{ alta_documento }}&tipo_documento={{ alta_tipo }}">Registrar paciente nuevo</a>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

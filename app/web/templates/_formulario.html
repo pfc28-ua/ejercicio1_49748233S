@@ -1,0 +1,50 @@
+{% from "_macros.html" import campo, selector %}
+<div class="bloques-form">
+
+  <fieldset class="bloque-form">
+    <legend><span class="paso">1</span> Documento de identidad</legend>
+    <div class="fila">
+      {{ selector('tipo_documento', 'Tipo', tipos_documento, datos, errores, clase='estrecho') }}
+      {{ campo('numero_documento', 'Número', datos, errores, obligatorio=True, clase='ancho') }}
+    </div>
+    <p class="verificador" id="verificador-documento" aria-live="polite"></p>
+  </fieldset>
+
+  <fieldset class="bloque-form">
+    <legend><span class="paso">2</span> Datos personales</legend>
+    <div class="fila">
+      {{ campo('nombre', 'Nombre', datos, errores, obligatorio=True) }}
+      {{ campo('primer_apellido', 'Primer apellido', datos, errores, obligatorio=True) }}
+      {{ campo('segundo_apellido', 'Segundo apellido', datos, errores) }}
+    </div>
+    <div class="fila">
+      {{ campo('fecha_nacimiento', 'Fecha de nacimiento', datos, errores, tipo='date', obligatorio=True) }}
+      {{ selector('sexo', 'Sexo', sexos, datos, errores) }}
+    </div>
+  </fieldset>
+
+  <fieldset class="bloque-form">
+    <legend><span class="paso">3</span> Seguro o mutua</legend>
+    <div class="fila">
+      {{ campo('entidad_aseguradora', 'Seguro o mutua', datos, errores, obligatorio=True, ayuda='Por ejemplo: Sistema Nacional de Salud, MUFACE, Sanitas…') }}
+      {{ campo('numero_poliza', 'Número de seguro o mutua', datos, errores, obligatorio=True, ayuda='Se guarda como dato del paciente.') }}
+    </div>
+  </fieldset>
+
+  <fieldset class="bloque-form">
+    <legend><span class="paso">4</span> Contacto <small>{{ nota_contacto }}</small></legend>
+    <div class="fila">
+      {{ campo('telefono', 'Teléfono', datos, errores, ayuda='Con o sin prefijo: +34 600 11 22 33') }}
+      {{ campo('email', 'Email', datos, errores) }}
+    </div>
+    <div class="fila">
+      {{ campo('direccion_calle', 'Dirección', datos, errores, clase='ancho') }}
+      {{ campo('direccion_cp', 'C. postal', datos, errores, clase='estrecho') }}
+    </div>
+    <div class="fila">
+      {{ campo('direccion_ciudad', 'Ciudad', datos, errores) }}
+      {{ campo('direccion_provincia', 'Provincia', datos, errores) }}
+      {{ campo('direccion_pais', 'País', datos, errores) }}
+    </div>
+  </fieldset>
+</div>

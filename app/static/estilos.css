@@ -1,0 +1,330 @@
+/* =========================================================================
+   Admisión · HIS — Registro e Identificación de Pacientes (RF-22)
+   Concepto: mostrador de admisión hospitalaria. Verde quirófano sobre papel
+   cálido; la identidad del paciente se presenta como su pulsera.
+   ========================================================================= */
+
+:root {
+  --papel: #f3efe6;
+  --papel-2: #ebe5d8;
+  --superficie: #fffdf8;
+  --tinta: #17241f;
+  --tinta-suave: #5d6b64;
+  --linea: #ddd5c4;
+
+  --quirofano: #0b6b5c;
+  --quirofano-oscuro: #07463d;
+  --quirofano-claro: #d7ebe4;
+  --menta: #9fd8c6;
+
+  --coral: #d9543f;
+  --coral-claro: #fbe3dd;
+  --ambar: #e8a33a;
+  --ambar-claro: #fbefd6;
+  --azul: #3f6fb5;
+  --azul-claro: #e1eaf7;
+
+  --radio: 14px;
+  --sombra: 0 1px 0 rgba(23, 36, 31, .04), 0 8px 24px -12px rgba(23, 36, 31, .18);
+
+  --titular: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --texto: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font: 15px/1.55 var(--texto);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+code { font-family: var(--mono); font-size: .88em; }
+.suave { color: var(--tinta-suave); }
+
+/* ---- Estructura --------------------------------------------------------- */
+.app { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+
+.lateral {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column; gap: 28px;
+  padding: 26px 18px;
+  background: var(--quirofano-oscuro);
+  color: #e6f2ee;
+}
+.marca { display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 0 8px; }
+.marca-cruz {
+  position: relative; width: 38px; height: 38px; border-radius: 11px;
+  background: var(--menta); flex: none;
+}
+.marca-cruz::before, .marca-cruz::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  background: var(--quirofano-oscuro); border-radius: 2px;
+  transform: translate(-50%, -50%);
+}
+.marca-cruz::before { width: 18px; height: 6px; }
+.marca-cruz::after { width: 6px; height: 18px; }
+.marca-texto strong { display: block; font: 700 19px/1.1 var(--titular); letter-spacing: -.2px; }
+.marca-texto small { color: #9dbdb3; font-size: 12px; }
+
+.menu { display: flex; flex-direction: column; gap: 4px; }
+.menu a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 10px;
+  color: #c4ddd5; text-decoration: none; font-weight: 500;
+  transition: background .15s, color .15s;
+}
+.menu a:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+.menu a.activo { background: var(--menta); color: var(--quirofano-oscuro); }
+.menu svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; flex: none; }
+
+.lateral-pie { margin-top: auto; padding: 14px 12px; border-top: 1px solid rgba(255,255,255,.1); font-size: 13px; }
+.lateral-pie small { display: block; color: #9dbdb3; margin-left: 16px; }
+.punto-vivo {
+  display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%;
+  background: var(--menta); box-shadow: 0 0 0 4px rgba(159, 216, 198, .2);
+}
+
+.principal { padding: 40px clamp(20px, 4vw, 56px) 80px; max-width: 1100px; width: 100%; }
+
+/* ---- Tipografía de página ---------------------------------------------- */
+h1, h2 { font-family: var(--titular); letter-spacing: -.4px; margin: 0; }
+h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.05; font-weight: 700; }
+h2 { font-size: 18px; font-weight: 700; }
+h2 small { font: 500 12px var(--texto); color: var(--tinta-suave); margin-left: 6px; letter-spacing: 0; }
+.antetitulo {
+  margin: 0 0 10px; font: 600 12px var(--texto);
+  text-transform: uppercase; letter-spacing: 1.4px; color: var(--quirofano);
+}
+.entradilla { margin: 8px 0 0; color: var(--tinta-suave); font-size: 16px; max-width: 62ch; }
+.titulo-seccion { margin: 36px 0 14px; }
+
+.cabecera-pagina { margin-bottom: 26px; }
+.volver { display: inline-block; margin-bottom: 14px; color: var(--tinta-suave); text-decoration: none; font-size: 14px; }
+.volver:hover { color: var(--quirofano); }
+
+/* ---- Botones y chips --------------------------------------------------- */
+.boton, button.boton {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 11px 20px; border: 0; border-radius: 999px;
+  background: var(--quirofano); color: #fff;
+  font: 600 14px var(--texto); text-decoration: none; cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.boton:hover { background: var(--quirofano-oscuro); }
+.boton:active { transform: translateY(1px); }
+.boton-fantasma { background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--linea); }
+.boton-fantasma:hover { background: var(--papel-2); }
+.boton-peligro { background: var(--coral); }
+.boton-peligro:hover { background: #b8412f; }
+
+code.hc {
+  padding: 2px 8px; border-radius: 6px;
+  background: var(--tinta); color: var(--menta);
+  font-weight: 700; letter-spacing: .4px;
+}
+
+/* ---- Buscador único ---------------------------------------------------- */
+.portada { padding: 18px 0 8px; }
+.portada h1 { font-size: clamp(36px, 6vw, 58px); }
+
+.buscador {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 26px; padding: 8px 8px 8px 20px;
+  background: var(--superficie); border-radius: 999px;
+  box-shadow: var(--sombra), inset 0 0 0 1.5px var(--linea);
+  transition: box-shadow .15s;
+}
+.buscador:focus-within { box-shadow: var(--sombra), inset 0 0 0 2px var(--quirofano); }
+.buscador svg { width: 22px; height: 22px; fill: none; stroke: var(--tinta-suave); stroke-width: 2; stroke-linecap: round; flex: none; }
+.buscador input {
+  flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+  font: 500 18px var(--texto); color: var(--tinta); padding: 10px 0;
+}
+.buscador button {
+  border: 0; border-radius: 999px; padding: 13px 26px; cursor: pointer;
+  background: var(--quirofano); color: #fff; font: 600 15px var(--texto);
+}
+.buscador button:hover { background: var(--quirofano-oscuro); }
+
+.buscador-pista { min-height: 30px; margin: 12px 0 0 20px; font-size: 14px; color: var(--tinta-suave); }
+.buscador-pista button {
+  border: 0; background: var(--papel-2); color: var(--tinta); cursor: pointer;
+  padding: 2px 9px; margin-left: 4px; border-radius: 6px; font: 500 13px var(--mono);
+}
+.buscador-pista button:hover { background: var(--quirofano-claro); }
+.pista-tipo { font-weight: 600; color: var(--quirofano); }
+.pista-ok { color: var(--quirofano); }
+.pista-mal { color: var(--coral); font-weight: 600; }
+
+/* ---- Listas de pacientes ----------------------------------------------- */
+.resultado { margin-top: 30px; }
+.resultado-criterio { margin: 0 0 14px; color: var(--tinta-suave); font-size: 14px; }
+.resultado-criterio code { background: var(--papel-2); padding: 2px 7px; border-radius: 5px; color: var(--tinta); }
+
+.avatar {
+  display: grid; place-items: center; flex: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: hsl(var(--tono) 45% 86%); color: hsl(var(--tono) 45% 26%);
+  font: 700 16px var(--titular); letter-spacing: .5px;
+}
+.avatar-grande { width: 72px; height: 72px; font-size: 26px; }
+
+.vacio {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  padding: 24px; border-radius: var(--radio);
+  background: var(--superficie); border: 1.5px dashed var(--linea);
+}
+.vacio > div:nth-child(2) { flex: 1; min-width: 220px; }
+.vacio p { margin: 4px 0 0; }
+.vacio-icono {
+  display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--ambar-claro); color: #8a5a10; font: 700 24px var(--titular);
+}
+
+/* ---- Alertas ----------------------------------------------------------- */
+.alerta {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 16px 20px; margin-bottom: 22px; border-radius: var(--radio);
+}
+.alerta > div:nth-child(2) { flex: 1; min-width: 220px; }
+.alerta p { margin: 3px 0 0; }
+.alerta-icono {
+  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  font: 700 18px var(--titular); flex: none;
+}
+.alerta-ok { background: var(--quirofano-claro); }
+.alerta-ok .alerta-icono { background: var(--quirofano); color: #fff; }
+.alerta-error, .alerta-duplicado { background: var(--coral-claro); }
+.alerta-error .alerta-icono, .alerta-duplicado .alerta-icono { background: var(--coral); color: #fff; }
+
+/* ---- Formularios ------------------------------------------------------- */
+.bloques-form { display: flex; flex-direction: column; gap: 16px; }
+.bloque-form {
+  margin: 0; padding: 22px 24px 10px; border: 0; border-radius: var(--radio);
+  background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea);
+}
+.bloque-form legend {
+  float: left; width: 100%; display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; font: 700 17px var(--titular);
+}
+.bloque-form legend small { font: 400 13px var(--texto); color: var(--tinta-suave); }
+.bloque-form legend + * { clear: both; }
+.paso {
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--quirofano); color: #fff; font: 700 13px var(--texto);
+}
+
+.fila { display: flex; gap: 14px; flex-wrap: wrap; }
+.campo { flex: 1 1 200px; display: flex; flex-direction: column; margin-bottom: 14px; }
+.campo.estrecho { flex: 0 1 150px; }
+.campo.ancho { flex: 3 1 260px; }
+.campo-etiqueta { font-size: 13px; font-weight: 600; color: var(--tinta-suave); margin-bottom: 5px; }
+.campo-etiqueta em { color: var(--coral); font-style: normal; }
+.campo input, .campo select, .form-baja input {
+  width: 100%; padding: 11px 13px; border-radius: 10px;
+  border: 1.5px solid var(--linea); background: #fff;
+  font: 500 15px var(--texto); color: var(--tinta);
+  transition: border-color .15s, box-shadow .15s;
+}
+.campo input:focus, .campo select:focus, .form-baja input:focus {
+  outline: 0; border-color: var(--quirofano); box-shadow: 0 0 0 4px var(--quirofano-claro);
+}
+.campo-ayuda { font-size: 12px; color: var(--tinta-suave); margin-top: 4px; }
+.campo-error { font-size: 12px; color: var(--coral); font-weight: 600; margin-top: 4px; }
+.con-error input { border-color: var(--coral); background: #fff8f6; }
+
+.verificador { margin: -6px 0 14px; min-height: 20px; font-size: 13px; }
+
+.barra-acciones {
+  position: sticky; bottom: 16px; z-index: 5;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 18px; padding: 12px 12px 12px 22px; border-radius: 999px;
+  background: rgba(255, 253, 248, .92); backdrop-filter: blur(8px);
+  box-shadow: var(--sombra), inset 0 0 0 1px var(--linea);
+}
+.barra-acciones .suave { margin-right: auto; font-size: 13px; }
+.barra-acciones em { color: var(--coral); font-style: normal; }
+
+/* ---- Ficha ------------------------------------------------------------- */
+.titulo-con-avatar { display: flex; align-items: center; gap: 18px; }
+.ficha-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.acciones { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* La pulsera */
+.pulsera { display: flex; align-items: stretch; margin: 30px 0; filter: drop-shadow(0 10px 18px rgba(7, 70, 61, .18)); }
+.pulsera-cierre {
+  width: 44px; flex: none; border-radius: 22px 0 0 22px;
+  background: radial-gradient(circle at 50% 50%, var(--papel) 0 7px, transparent 8px), var(--quirofano-oscuro);
+}
+.pulsera-cola {
+  width: 70px; flex: none; border-radius: 0 40px 40px 0;
+  background: repeating-linear-gradient(90deg, var(--quirofano) 0 12px, var(--quirofano-oscuro) 12px 14px);
+}
+.pulsera-cuerpo {
+  flex: 1; display: flex; align-items: center; gap: 26px; flex-wrap: wrap;
+  padding: 18px 26px;
+  background: linear-gradient(180deg, #fff 0%, #f7fbf9 100%);
+  border-top: 5px solid var(--quirofano); border-bottom: 5px solid var(--quirofano);
+}
+.pulsera-datos { display: flex; flex-direction: column; min-width: 220px; }
+.pulsera-etiqueta { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--tinta-suave); }
+.pulsera-codigo { font: 700 26px/1.2 var(--mono); color: var(--quirofano-oscuro); letter-spacing: 1px; }
+.pulsera-nombre { font: 700 14px var(--mono); margin-top: 4px; }
+.pulsera-sub { font: 500 12px var(--mono); color: var(--tinta-suave); }
+.pulsera-barras { display: flex; align-items: stretch; gap: 2px; height: 58px; padding: 0 6px; }
+.pulsera-barras i { display: block; width: calc(var(--w) * 1.6px); background: var(--tinta); }
+.pulsera-barras i:nth-child(3n) { background: transparent; }
+.pulsera-id { display: flex; flex-direction: column; gap: 3px; margin-left: auto; min-width: 0; }
+.pulsera-id code { font-size: 12px; color: var(--tinta); word-break: break-all; }
+.copiar {
+  align-self: flex-start; margin-top: 4px; padding: 3px 10px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--linea); background: #fff; font: 600 12px var(--texto); color: var(--quirofano);
+}
+.copiar:hover { border-color: var(--quirofano); }
+
+.ficha-rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tarjeta {
+  padding: 22px 24px; border-radius: var(--radio);
+  background: var(--superficie); box-shadow: inset 0 0 0 1px var(--linea);
+}
+.tarjeta h2 { margin-bottom: 14px; }
+.datos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin: 0; }
+.datos .completo { grid-column: 1 / -1; }
+.datos dt { font-size: 12px; font-weight: 600; color: var(--tinta-suave); }
+.datos dd { margin: 2px 0 0; font-weight: 500; word-break: break-word; }
+.tarjeta-ancha { grid-column: 1 / -1; }
+.datos-tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.tarjeta-verificar { background: var(--quirofano-claro); box-shadow: none; }
+.tarjeta-verificar p { margin: -8px 0 14px; }
+.comprobaciones { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.comprobaciones li {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; border-radius: 10px; background: var(--superficie);
+}
+.comprobaciones span { font-size: 13px; color: var(--tinta-suave); }
+.comprobaciones strong { font-weight: 600; }
+
+/* ---- Adaptación a pantallas estrechas ---------------------------------- */
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; }
+  .lateral {
+    position: sticky; height: auto; z-index: 10;
+    flex-direction: row; align-items: center; gap: 12px; padding: 12px 16px;
+  }
+  .marca-texto small, .lateral-pie { display: none; }
+  .menu { flex-direction: row; margin-left: auto; }
+  .menu a { padding: 9px; font-size: 0; gap: 0; }
+  .principal { padding-top: 26px; }
+  .ficha-rejilla { grid-template-columns: 1fr; }
+  .pulsera-cola, .pulsera-barras { display: none; }
+  .barra-acciones { border-radius: var(--radio); }
+}
+@media (max-width: 520px) {
+  .datos, .datos-tres { grid-template-columns: 1fr; }
+  .buscador { border-radius: var(--radio); flex-wrap: wrap; padding: 10px 14px; }
+  .buscador button { width: 100%; }
+}

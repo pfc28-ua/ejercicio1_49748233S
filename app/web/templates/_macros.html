@@ -1,0 +1,27 @@
+{% macro avatar(p, tamano='') -%}
+<span class="avatar {{ tamano }}" style="--tono: {{ (p.nombre ~ p.primer_apellido)|tono }}">
+  {{- p.nombre[0] }}{{ p.primer_apellido[0] -}}
+</span>
+{%- endmacro %}
+
+{% macro campo(nombre, etiqueta, datos, errores, tipo='text', obligatorio=False, ayuda='', clase='') -%}
+<label class="campo {{ clase }} {{ 'con-error' if errores.get(nombre) }}">
+  <span class="campo-etiqueta">{{ etiqueta }}{% if obligatorio %} <em>*</em>{% endif %}</span>
+  <input type="{{ tipo }}" name="{{ nombre }}" id="{{ nombre }}" value="{{ datos.get(nombre, '') or '' }}"
+         {% if obligatorio %}required{% endif %} autocomplete="off">
+  {% if errores.get(nombre) %}<span class="campo-error">{{ errores[nombre] }}</span>
+  {% elif ayuda %}<span class="campo-ayuda">{{ ayuda }}</span>{% endif %}
+</label>
+{%- endmacro %}
+
+{% macro selector(nombre, etiqueta, opciones, datos, errores, clase='') -%}
+<label class="campo {{ clase }} {{ 'con-error' if errores.get(nombre) }}">
+  <span class="campo-etiqueta">{{ etiqueta }}</span>
+  <select name="{{ nombre }}" id="{{ nombre }}">
+    {% for o in opciones %}
+    <option value="{{ o }}" {% if o == datos.get(nombre) %}selected{% endif %}>{{ o|etiqueta }}</option>
+    {% endfor %}
+  </select>
+  {% if errores.get(nombre) %}<span class="campo-error">{{ errores[nombre] }}</span>{% endif %}
+</label>
+{%- endmacro %}

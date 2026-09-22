@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar %}
+{% block titulo %}{{ paciente.nombre_completo }} · Admisión HIS{% endblock %}
+
+{% block contenido %}
+<header class="cabecera-pagina">
+  <a class="volver" href="/">← Nueva búsqueda</a>
+</header>
+
+{% if recien_creado %}
+<div class="alerta alerta-ok">
+  <div class="alerta-icono" aria-hidden="true">✓</div>
+  <div>
+    <strong>Paciente registrado correctamente.</strong>
+    <p>Su código de historia clínica es <code class="hc">{{ paciente.codigo_historia_clinica }}</code></p>
+  </div>
+</div>
+{% elif guardado %}
+<div class="alerta alerta-ok">
+  <div class="alerta-icono" aria-hidden="true">✓</div>
+  <div><strong>Datos guardados.</strong><p>La identidad del paciente no ha cambiado.</p></div>
+</div>
+{% endif %}
+
+<section class="ficha-cabecera">
+  <div class="titulo-con-avatar">
+    {{ avatar(paciente, 'avatar-grande') }}
+    <div>
+      <h1>{{ paciente.nombre_completo }}</h1>
+      <p class="entradilla">{{ paciente.edad() }} años · {{ paciente.sexo|etiqueta }}</p>
+    </div>
+  </div>
+  <a class="boton" href="/pacientes/{{ paciente.patient_id }}/editar">Modificar datos</a>
+</section>
+
+<!-- Identidad del paciente con la forma de su pulsera (RF-13, plan.md DT-08) -->
+<section class="pulsera" aria-label="Identidad del paciente">
+  <div class="pulsera-cierre" aria-hidden="true"></div>
+  <div class="pulsera-cuerpo">
+    <div class="pulsera-datos">
+      <span class="pulsera-etiqueta">Historia clínica</span>
+      <code class="pulsera-codigo">{{ paciente.codigo_historia_clinica }}</code>
+      <span class="pulsera-nombre">{{ paciente.primer_apellido|upper }} {{ (paciente.segundo_apellido or '')|upper }}, {{ paciente.nombre }}</span>
+      <span class="pulsera-sub">{{ paciente.tipo_documento|etiqueta }} {{ paciente.numero_documento }} · F. nac. {{ paciente.fecha_nacimiento|fecha }}</span>
+    </div>
+    <div class="pulsera-barras" aria-hidden="true">
+      {% for ancho in barras %}<i style="--w: {{ ancho }}"></i>{% endfor %}
+    </div>
+    <div class="pulsera-id">
+      <span class="pulsera-etiqueta">patient_id · identidad para otros módulos</span>
+      <code>{{ paciente.patient_id }}</code>
+      <button type="button" class="copiar" data-copiar="{{ paciente.patient_id }}">Copiar</button>
+    </div>
+  </div>
+  <div class="pulsera-cola" aria-hidden="true"></div>
+</section>
+
+<div class="ficha-rejilla">
+  <section class="tarjeta tarjeta-verificar">
+    <h2>Verificar identidad</h2>
+    <p class="suave">Comprueba estos datos con el paciente antes de continuar.</p>
+    <ul class="comprobaciones">
+      <li><span>Nombre y apellidos</span><strong>{{ paciente.nombre_completo }}</strong></li>
+      <li><span>Fecha de nacimiento</span><strong>{{ paciente.fecha_nacimiento|fecha }}</strong></li>
+      <li><span>{{ paciente.tipo_documento|etiqueta }}</span><strong>{{ paciente.numero_documento }}</strong></li>
+    </ul>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Seguro o mutua</h2>
+    <dl class="datos">
+      <div class="completo"><dt>Entidad</dt><dd>{{ paciente.entidad_aseguradora }}</dd></div>
+      <div class="completo"><dt>Número</dt><dd>{{ paciente.numero_poliza }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="tarjeta tarjeta-ancha">
+    <h2>Contacto</h2>
+    <dl class="datos datos-tres">
+      <div><dt>Teléfono</dt><dd>{{ paciente.telefono or '—' }}</dd></div>
+      <div><dt>Email</dt><dd>{{ paciente.email or '—' }}</dd></div>
+      <div><dt>Dirección</dt><dd>
+        {% if paciente.direccion_calle or paciente.direccion_ciudad or paciente.direccion_cp %}
+          {{ paciente.direccion_calle or '' }}<br>
+          {{ paciente.direccion_cp or '' }} {{ paciente.direccion_ciudad or '' }}
+          {% if paciente.direccion_provincia %}({{ paciente.direccion_provincia }}){% endif %}
+          {% if paciente.direccion_pais %}· {{ paciente.direccion_pais }}{% endif %}
+        {% else %}—{% endif %}
+      </dd></div>
+    </dl>
+  </section>
+</div>
+{% endblock %}

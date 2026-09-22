@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Registrar paciente · Admisión HIS{% endblock %}
+
+{% block contenido %}
+<header class="cabecera-pagina">
+  <a class="volver" href="/">← Volver a la búsqueda</a>
+  <h1>Registrar paciente</h1>
+  <p class="entradilla">Al guardar, el sistema le asigna su identidad única en el HIS: un código de historia clínica y un identificador interno que usarán citas, historia clínica y facturación.</p>
+</header>
+
+{% if duplicado %}
+<div class="alerta alerta-duplicado">
+  <div class="alerta-icono" aria-hidden="true">!</div>
+  <div>
+    <strong>{{ mensaje }}</strong>
+    <p>Ese documento ya tiene la historia clínica <code class="hc">{{ duplicado.codigo_historia_clinica }}</code>. No hace falta registrarlo de nuevo.</p>
+  </div>
+  <a class="boton" href="/pacientes/{{ duplicado.patient_id }}">Ir a la ficha existente</a>
+</div>
+{% elif mensaje %}
+<div class="alerta alerta-error">
+  <div class="alerta-icono" aria-hidden="true">!</div>
+  <div><strong>{{ mensaje }}</strong><p>Los campos con problemas están marcados en rojo.</p></div>
+</div>
+{% endif %}
+
+<form method="post" action="/pacientes/nuevo" class="formulario" novalidate>
+  {% with nota_contacto = 'opcional' %}{% include "_formulario.html" %}{% endwith %}
+  <div class="barra-acciones">
+    <span class="suave">Los campos con <em>*</em> son obligatorios</span>
+    <a class="boton boton-fantasma" href="/">Cancelar</a>
+    <button type="submit" class="boton">Registrar y asignar identidad</button>
+  </div>
+</form>
+{% endblock %}
